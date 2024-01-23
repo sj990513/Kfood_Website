@@ -129,6 +129,7 @@ public class jdbcMenuRepository implements MenuRepository {
         return jdbcTemplate.query(sql, new Object[]{menuNumber}, new CommentRowMapper());
     }
 
+    
     //댓글저장
     @Override
     public void saveComment(String commentText, Long menuNumber, String memberId) {
