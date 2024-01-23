@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/kfooddb?serverTimezone=Asia/Seoul
+    username: root
+    password: Rlatjswo159874!
+
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: rlatjswo159874@naver.com
+    password: sj690808!
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+      mail.smtp.ssl.trust: smtp.naver.com
+      mail.smtp.starttls.enable: true

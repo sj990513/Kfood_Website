@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>K-Food Recipe(한국 음식 레시피)</title>
+    <!-- Favicon-->
+    <link rel="icon" type="/image/x-icon" href="/assets/favicon.ico"/>
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="/text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+          type="/text/css"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <style>
+        .custom-modal{display:none;position:fixed;max-width:500px;height:500px;width:90%;border:1px solid black;box-shadow:1px 2px 3px black;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:10px;}
+        .custom-modal #data_table{max-height:400px;overflow-y:auto}
+
+    </style>
+</head>
+<body id="page-top">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/">K-Food Recipe</a>
+        <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <div style="display: flex;" th:if="${session.member == null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
+                </div>
+                <div style="display: flex;" th:if="${session.member != null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
+
+                    <!-- 관리자권한일시 (0) 관리자페이지로 -->
+                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    </div>
+                </div>
+            </ul>
+            <script th:inline="javascript">
+                var logoutMessage = [[${logout}]];
+                if (logoutMessage) {
+                     alert(logoutMessage);
+                }
+
+            </script>
+        </div>
+    </div>
+</nav>
+<!-- Masthead-->
+
+<!-- 1 Section -->
+<header class="masthead bg-primary text-white text-center">
+    <div class="container">
+
+        <form action="/menu/detail" method="GET">
+            <input type="hidden" name="menuNumber" th:value="${menuNumber}" />
+            <button type="submit" class="btn btn-secondary btn-user btn-block">
+                Back To Menu
+            </button>
+        </form>
+
+    </div>
+    <h1></h1>
+    <h1></h1>
+    <div class="container">
+        <div class="card o-hidden border-0 shadow-lg">
+            <!-- Nested Row within Card Body -->
+            <div class="col-lg-7 container">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4" style="color: #000000;">Edit Menu</h1>
+                    </div>
+                    <hr>
+                    <hr>
+                    <hr>
+
+                    <form class="user" action="/menu/editMenu" method="POST">
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_name" placeholder="Menu name" th:value="${menuName}" required>
+                            </div>
+                            <hr>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_weight" placeholder="1 serving weight (only number)"  th:value="${menuWeight}" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_cal" placeholder="Calorie (only number)" th:value="${menuCal}" required>
+                            </div>
+                            <hr>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_car" placeholder="Carbohydrate (only number)" th:value="${menuCar}" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_pro" placeholder="Protein (only number)" th:value="${menuPro}" required>
+                            </div>
+                            <hr>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_fat" placeholder="Fat (only number)" th:value="${menuFat}" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_na" placeholder="Salt (only number)" th:value="${menuNa}" required>
+                            </div>
+                            <hr>
+                            <div>
+                                <input type="text" class="form-control form-control-user" name="menu_image" placeholder="Menu image url" th:value="${menuImage}" required>
+                            </div>
+                        </div>
+                        <hr>
+                        <hr>
+                        <!-- Container to hold dynamically added recipe inputs -->> <!-- Adjust the form action as needed -->
+                        <div id="recipeContainer">
+                            <div th:each="recipe : ${recipes}" class="recipe-inputs">
+                                <hr>
+                                <input type='text' class='form-control form-control-user' name='recipe' placeholder='Please write your recipe' required th:value="${recipe.recipeDisc}">
+                                <input type='text' class='form-control form-control-user' name='recipe_image' placeholder='Please insert the recipe image url' required th:value="${recipe.recipeImageUrl}">
+                            </div>
+                        </div>
+                        <hr>
+
+                        <button type="button" class="btn btn-dark" onclick="addRecipeInput();">
+                            Add recipe
+                        </button>
+                        <button type="button" class="btn btn-dark" onclick="removeRecipeInput();">
+                            Remove recipe
+                        </button>
+
+                        <!-- hidden으로보내서 editMenu에서 POST로도 사용할수있게-->
+                        <input type="hidden" name="menuNumber_hidden" th:value="${menuNumber}" />
+                        <hr>
+                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                            Edit Menu
+                        </button>
+                    </form>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<script>
+    function addRecipeInput() {
+        var container = document.getElementById('recipeContainer');
+        var newInput = document.createElement('div');
+        newInput.className = 'recipe-inputs';
+        newInput.innerHTML = `
+            <hr>
+            <input type='text' class='form-control form-control-user' name='recipe' placeholder='Please write your recipe' required>
+            <input type='text' class='form-control form-control-user' name='recipe_image' placeholder='Please insert the recipe image url' required>
+        `;
+        container.appendChild(newInput);
+    }
+
+    function removeRecipeInput() {
+        var container = document.getElementById('recipeContainer');
+        var inputs = container.getElementsByClassName('recipe-inputs');
+        if (inputs.length > 0) {
+            container.removeChild(inputs[inputs.length - 1]);
+        }
+    }
+</script>
+
+
+
+<script th:inline="javascript">
+    var editMenuSuccess = [[${editMenuSuccess}]];
+    if (editMenuSuccess) {
+         alert(editMenuSuccess);
+    }
+
+</script>
+
+
+
+
+<!-- Copyright Section-->
+<div class="copyright py-4 text-center text-white">
+    <div class="container"><small>K-Food Recipe</small></div>
+</div>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<!-- * *                               SB Forms JS                               * *-->
+<!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+
+<script th:inline="javascript">
+    var addMenuSuccess = [[${addMenuSuccess}]];
+    if (addMenuSuccess) {
+         alert(addMenuSuccess);
+    }
+
+</script>
+
+</body>
+</html>

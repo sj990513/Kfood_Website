@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Mypage</title>
+    <!-- Favicon-->
+    <link rel="icon" type="/image/x-icon" href="/assets/favicon.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="/text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="/text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="/text/css" />
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet" />
+</head>
+<body id="page-top">
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/">K-Food Recipe</a>
+        <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <div style="display: flex;" th:if="${session.member == null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
+                </div>
+                <div style="display: flex;" th:if="${session.member != null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
+
+                    <!-- 관리자권한일시 (0) 관리자페이지로 -->
+                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- Masthead-->
+
+<!-- 1 Section -->
+<header class="masthead bg-primary text-white text-center">
+</header>
+
+<div class="container mt-5">
+    <form action="/members/admin" method="post">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Administrator Page</h1>
+        </div>
+        <div class="container mt-5">
+            <h2>Member Management</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mobile Phone Number</th>
+                    <th>Name</th>
+                    <th>Membership Level</th>
+                    <th>Search for written posts</th>
+                    <th>Search for written comments</th>
+                    <th>Delete this member</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over a portion of members based on the current page -->
+                <tr th:each="member : ${members}">
+                    <td>
+                        <!-- Hidden field for memberId -->
+                        <input type="hidden" name="memberId" th:value="${member.memberId}">
+                        <!-- Display memberId -->
+                        <span th:text="${member.memberId}"></span>
+                    </td>
+                    <td th:text="${member.memberPhoneNumber}"></td>
+                    <td th:text="${member.memberName}"></td>
+                    <td>
+                        <!-- Dropdown for membership level -->
+                        <select name="memberAuth">
+                            <option value="0" th:selected="${member.memberAuthority == 0}">Administrator</option>
+                            <option value="1" th:selected="${member.memberAuthority == 1}">General Member</option>
+                        </select>
+                    </td>
+                    <td>
+                        <!-- 작성글 검색을 위한 버튼 -->
+                        <a th:href="@{/members/searchPost(memberId=${member.memberId})}" class="btn btn-primary">
+                            Search
+                        </a>
+                    </td>
+                    <td>
+                        <!-- 댓글 검색을 위한 버튼 -->
+                        <a th:href="@{/members/searchComment(memberId=${member.memberId})}" class="btn btn-primary">
+                            Search
+                        </a>
+                    </td>
+                    <td>
+                        <!-- Button to delete member with confirmation -->
+                        <button type="button" class="btn btn-secondary btn-user btn-block"  th:onclick="confirmAndSubmit( [[${member.memberId}]] )">
+                            Delete
+                        </button>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn btn-primary btn-user btn-block">
+                Change User Info
+            </button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination d-flex justify-content-center mt-4">
+            <ul class="pagination">
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    function confirmAndSubmit(memberId) {
+        console.log(memberId);
+        if (confirm('Are you sure you want to delete it?')) {
+            var form = document.createElement('form');
+            form.action = '/members/deleteMember';
+            form.method = 'post';
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'memberId';
+            input.value = memberId;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+    }
+</script>
+
+
+
+
+<script th:inline="javascript">
+    var updateUserInfoSuccess = [[${updateUserInfoSuccess}]];
+    if (updateUserInfoSuccess) {
+         alert(updateUserInfoSuccess);
+    }
+
+</script>
+
+
+<script>
+    var pageSize = 10; // 페이지에 표시될 멤버수
+    var currentPage = 1; // 첫페이지
+
+    function showMembersPage(page) {
+        var members = document.querySelectorAll('.table tbody tr');
+        var totalPages = Math.ceil(members.length / pageSize);
+
+        // Show members for the current page
+        for (var i = 0; i < members.length; i++) {
+            members[i].style.display = (i >= (page - 1) * pageSize && i < page * pageSize) ? 'table-row' : 'none';
+        }
+
+        // Update pagination links
+        updateMembersPagination(totalPages, page);
+    }
+
+    function updateMembersPagination(totalPages, currentPage) {
+        var paginationContainer = document.querySelector('.pagination ul');
+        paginationContainer.innerHTML = '';
+
+        for (var i = 1; i <= totalPages; i++) {
+            var li = document.createElement('li');
+            li.className = 'page-item' + (i === currentPage ? ' active' : '');
+
+            var a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.innerText = i;
+
+            a.addEventListener('click', function (event) {
+                event.preventDefault();
+                currentPage = parseInt(event.target.innerText);
+                showMembersPage(currentPage);
+            });
+
+            li.appendChild(a);
+            paginationContainer.appendChild(li);
+        }
+    }
+
+    // Show initial page on window load
+    window.onload = function () {
+        showMembersPage(currentPage);
+    };
+</script>
+
+
+
+
+
+
+<!-- 1 Section -->
+<header class="masthead bg-primary text-white text-center">
+</header>
+
+<!-- Copyright Section-->
+<div class="copyright py-4 text-center text-white">
+    <div class="container"><small>K-Food Recipe</small></div>
+</div>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<!-- * *                               SB Forms JS                               * *-->
+<!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+</body>
+</html>

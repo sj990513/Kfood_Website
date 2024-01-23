@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>K-Food Recipe(한국 음식 레시피)</title>
+    <!-- Favicon-->
+    <link rel="icon" type="/image/x-icon" href="/assets/favicon.ico"/>
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="/text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+          type="/text/css"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <style>
+        .custom-modal{display:none;position:fixed;max-width:500px;height:500px;width:90%;border:1px solid black;box-shadow:1px 2px 3px black;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:10px;}
+        .custom-modal #data_table{max-height:400px;overflow-y:auto}
+
+    </style>
+</head>
+<body id="page-top">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/">K-Food Recipe</a>
+        <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <div style="display: flex;" th:if="${session.member == null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
+                </div>
+                <div style="display: flex;" th:if="${session.member != null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
+
+                    <!-- 관리자권한일시 (0) 관리자페이지로 -->
+                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    </div>
+                </div>
+            </ul>
+            <script th:inline="javascript">
+                var logoutMessage = [[${logout}]];
+                if (logoutMessage) {
+                     alert(logoutMessage);
+                }
+
+            </script>
+        </div>
+    </div>
+</nav>
+<!-- Masthead-->
+
+
+<div class="card o-hidden border-0 shadow-lg">
+    <header class="masthead bg-primary text-white text-center">
+        <button type="button" class="btn btn-secondary btn-user btn-block" onclick="location.href='/members/mypage'">
+            Back To My Page
+        </button>
+        <div class="col-lg-7 container">
+            <form action="/members/myPost" method="get" onsubmit="return keepSelectValue()">
+                <div class="d-flex justify-content-center">
+                    <div class="col-sm-2">
+                        <input type="text" name="search" placeholder="Type Menu Name" class="form-control form-control-user" />
+                    </div>
+                    <input type="submit" value="Search" class="btn btn-dark" />
+                </div>
+            </form>
+        </div>
+    </header>
+</div>
+
+<script>
+    // Function to keep the select value after form submission
+    function keepSelectValue() {
+      var selectElement = document.getElementById("mySelect");
+      var selectedValue = selectElement.value;
+      sessionStorage.setItem("selectedValue", selectedValue);
+      return true; // Allow form submission
+    }
+
+    // Restore the select value when the page loads
+    window.onload = function() {
+      var selectElement = document.getElementById("mySelect");
+      var selectedValue = sessionStorage.getItem("selectedValue");
+      if (selectedValue) {
+        selectElement.value = selectedValue;
+      }
+    };
+
+</script>
+
+
+<div class="card o-hidden border-0 shadow-lg">
+    <section class="py-5">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">My Post</h1>
+        </div>
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-4 justify-content-center">
+                <div class="col mb-5" th:each="menu : ${menus}">
+                    <div class="card h-100">
+                        <img class="card-img-top" th:src="${menu.menuImageUrl}" style="max-width: 300px; height: 200px;" alt="..."/>
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <h5 class="fw-bolder" th:text="${menu.menuName}"></h5>
+                            </div>
+                        </div>
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <form action="/menu/detail" method="GET">
+                                <div class="text-center">
+                                    <button type="submit" name="menuNumber" class="btn btn-outline-dark mt-auto"
+                                            th:value="${menu.menuNumber}">View Details
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination d-flex justify-content-center mt-4">
+            <ul class="pagination">
+                <!-- 페이지네이션 링크는 여기에 동적으로 추가됩니다 -->
+            </ul>
+        </div>
+
+    </section>
+</div>
+
+
+<script>
+    var pageSize = 16; // 페이지당 나올 메뉴 개수
+    var currentPage = 1; // 초기 페이지
+
+    function showPage(page) {
+        var menus = document.querySelectorAll('.col.mb-5');
+        var totalPages = Math.ceil(menus.length / pageSize);
+
+        // 현재 페이지 따른 메뉴
+        for (var i = 0; i < menus.length; i++) {
+            menus[i].style.display = (i >= (page - 1) * pageSize && i < page * pageSize) ? 'block' : 'none';
+        }
+
+        // 페이지네이션 링크 업데이트
+        updatePagination(totalPages, page);
+    }
+
+    function updatePagination(totalPages, currentPage) {
+        var paginationContainer = document.querySelector('.pagination ul');
+        paginationContainer.innerHTML = '';
+
+        for (var i = 1; i <= totalPages; i++) {
+            var li = document.createElement('li');
+            li.className = 'page-item' + (i === currentPage ? ' active' : '');
+
+            var a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.innerText = i;
+
+            a.addEventListener('click', function (event) {
+                event.preventDefault();
+                currentPage = parseInt(event.target.innerText);
+                showPage(currentPage);
+            });
+
+            li.appendChild(a);
+            paginationContainer.appendChild(li);
+        }
+    }
+
+    // 페이지 로드 시 초기 페이지 표시
+    window.onload = function () {
+        showPage(currentPage);
+    };
+</script>
+
+
+<!-- 3 Section 필요 없으면 삭제 -->
+<section class="page-section bg-primary text-white mb-0" id="about">
+
+</section>
+<!-- 3 Section 끝 -->
+
+<!-- layerPop 시작 -->
+<div id="modal" class="custom-modal">
+    <div class="text-end">
+        <i class="btn-close" onclick="javascript:modal_end()"></i>
+    </div>
+    <div>
+        <h5 id="title" class="text-center"></h5>
+    </div>
+    <div id="data_table">
+    </div>
+</div>
+<!-- layerPop 끝 -->
+
+<!-- Copyright Section-->
+<div class="copyright py-4 text-center text-white">
+    <div class="container"><small>K-Food Recipe</small></div>
+</div>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<!-- * *                               SB Forms JS                               * *-->
+<!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+</body>
+</html>

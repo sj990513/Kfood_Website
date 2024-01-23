@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>K-Food Recipe(한국 음식 레시피)</title>
+    <!-- Favicon-->
+    <link rel="icon" type="/image/x-icon" href="/assets/favicon.ico"/>
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="/text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+          type="/text/css"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <style>
+        .custom-modal{display:none;position:fixed;max-width:500px;height:500px;width:90%;border:1px solid black;box-shadow:1px 2px 3px black;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:10px;}
+        .custom-modal #data_table{max-height:400px;overflow-y:auto}
+
+    </style>
+</head>
+<body id="page-top">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/">K-Food Recipe</a>
+        <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <div style="display: flex;" th:if="${session.member == null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
+                </div>
+                <div style="display: flex;" th:if="${session.member != null}">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
+
+                    <!-- 관리자권한일시 (0) 관리자페이지로 -->
+                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    </div>
+                </div>
+            </ul>
+            <script th:inline="javascript">
+                var logoutMessage = [[${logout}]];
+                if (logoutMessage) {
+                     alert(logoutMessage);
+                }
+
+            </script>
+        </div>
+    </div>
+</nav>
+<!-- Masthead-->
+
+<!-- 1 Section -->
+<header class="masthead bg-primary text-white text-center">
+</header>
+
+<div class="container mt-5">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">MY Comments</h1>
+        </div>
+        <div class="container mt-5">
+            <h2>Comment List</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Comment Number</th>
+                    <th>Comment Text</th>
+                    <th>Delete this comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over a portion of members based on the current page -->
+                <tr th:each="comment : ${comments}">
+                    <td th:text="${comment.commentNumber}"></td>
+                    <td th:text="${comment.commentText}"></td>
+                    <td>
+                        <!-- 삭제버튼 -->
+                        <form th:action="@{/members/deleteComment}" method="post" onsubmit="return confirm('Are you sure you want to delete it?')">
+                            <input type="hidden" name="commentNumber" th:value="${comment.commentNumber}" />
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination d-flex justify-content-center mt-4">
+            <ul class="pagination">
+            </ul>
+        </div>
+</div>
+
+
+
+<script th:inline="javascript">
+    var updateUserInfoSuccess = [[${updateUserInfoSuccess}]];
+    if (updateUserInfoSuccess) {
+         alert(updateUserInfoSuccess);
+    }
+
+</script>
+
+
+<script>
+    var pageSize = 10; // 페이지에 표시될 댓글수
+    var currentPage = 1; // 첫페이지
+
+    function showMembersPage(page) {
+        var members = document.querySelectorAll('.table tbody tr');
+        var totalPages = Math.ceil(members.length / pageSize);
+
+        // Show members for the current page
+        for (var i = 0; i < members.length; i++) {
+            members[i].style.display = (i >= (page - 1) * pageSize && i < page * pageSize) ? 'table-row' : 'none';
+        }
+
+        // Update pagination links
+        updateMembersPagination(totalPages, page);
+    }
+
+    function updateMembersPagination(totalPages, currentPage) {
+        var paginationContainer = document.querySelector('.pagination ul');
+        paginationContainer.innerHTML = '';
+
+        for (var i = 1; i <= totalPages; i++) {
+            var li = document.createElement('li');
+            li.className = 'page-item' + (i === currentPage ? ' active' : '');
+
+            var a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.innerText = i;
+
+            a.addEventListener('click', function (event) {
+                event.preventDefault();
+                currentPage = parseInt(event.target.innerText);
+                showMembersPage(currentPage);
+            });
+
+            li.appendChild(a);
+            paginationContainer.appendChild(li);
+        }
+    }
+
+    // Show initial page on window load
+    window.onload = function () {
+        showMembersPage(currentPage);
+    };
+</script>
+
+
+
+
+<!-- 3 Section 필요 없으면 삭제 -->
+<section class="page-section bg-primary text-white mb-0" id="about">
+
+</section>
+<!-- 3 Section 끝 -->
+
+<!-- layerPop 시작 -->
+<div id="modal" class="custom-modal">
+    <div class="text-end">
+        <i class="btn-close" onclick="javascript:modal_end()"></i>
+    </div>
+    <div>
+        <h5 id="title" class="text-center"></h5>
+    </div>
+    <div id="data_table">
+    </div>
+</div>
+<!-- layerPop 끝 -->
+
+<!-- Copyright Section-->
+<div class="copyright py-4 text-center text-white">
+    <div class="container"><small>K-Food Recipe</small></div>
+</div>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<!-- * *                               SB Forms JS                               * *-->
+<!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+</body>
+</html>
