@@ -7,8 +7,9 @@ public class Member {
     private String memberPassword;
     private String memberPhoneNumber;
     private String memberName;
-    private Long memberAuthority;
+    private String memberAuthority;
     private String memberEmail;
+
 
     public String getMemberEmail() {
         return memberEmail;
@@ -18,11 +19,11 @@ public class Member {
         this.memberEmail = memberEmail;
     }
 
-    public Long getMemberAuthority() {
+    public String getMemberAuthority() {
         return memberAuthority;
     }
 
-    public void setMemberAuthority(Long memberAuthority) {
+    public void setMemberAuthority(String memberAuthority) {
         this.memberAuthority = memberAuthority;
     }
 

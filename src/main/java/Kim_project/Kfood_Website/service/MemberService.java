@@ -115,9 +115,7 @@ public class MemberService {
     //회원권한수정
     public void updateMemberAuthority(String memberId, String memberAuthority) {
 
-        Long memberAuth = Long.parseLong(memberAuthority);
-
-        memberRepository.updateAuthority(memberId, memberAuth);
+        memberRepository.updateAuthority(memberId, memberAuthority);
     }
 
 }

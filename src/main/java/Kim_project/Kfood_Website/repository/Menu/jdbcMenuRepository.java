@@ -32,21 +32,21 @@ public class jdbcMenuRepository implements MenuRepository {
     //모든메뉴 정렬
     @Override
     public List<Menu> findAll() {
-        String sql = "SELECT * FROM MENU";
+        String sql = "SELECT * FROM menu";
         return jdbcTemplate.query(sql, new MenuRowMapper());
     }
 
     //특정 멤버가 작성한 모든메뉴 정렬
     @Override
     public List<Menu> findAllByMember(String memberId) {
-        String sql = "SELECT * FROM MENU WHERE memberId = ?";
+        String sql = "SELECT * FROM menu WHERE memberId = ?";
         return jdbcTemplate.query(sql, new Object[]{memberId}, new MenuRowMapper());
     }
 
     //재료별로 메뉴정렬
     @Override
     public List<Menu> findMenuByNutrition(String nutrition) {
-        String sql = "SELECT * FROM MENU ORDER BY " + nutrition + " ASC";
+        String sql = "SELECT * FROM menu ORDER BY " + nutrition + " ASC";
         return jdbcTemplate.query(sql, new MenuRowMapper());
     }
 
@@ -129,7 +129,7 @@ public class jdbcMenuRepository implements MenuRepository {
         return jdbcTemplate.query(sql, new Object[]{menuNumber}, new CommentRowMapper());
     }
 
-    
+
     //댓글저장
     @Override
     public void saveComment(String commentText, Long menuNumber, String memberId) {

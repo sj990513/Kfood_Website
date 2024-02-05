@@ -114,15 +114,13 @@ public class MenuService {
 
             int diff = recipes.length - before.size();
 
-            //일단 원래길이만큼은 update
-            for(int i = 0; i < diff; i++)
+            // First, update the original length
+            for (int i = 0; i < Math.min(before.size(), recipes.length); i++)
                 menuRepository.updateRecipe(recipes[i], recipeImages[i], menuNumber, before.get(i).getReipeNumber());
 
-
-            //그다음부턴 추가로
-            for(int i = diff; i<recipes.length; i++)
+            // From then on, additionally
+            for (int i = before.size(); i < recipes.length; i++)
                 menuRepository.saveRecipe(recipes[i], recipeImages[i], menuNumber);
-
         }
 
         //기존거랑 똑같을때

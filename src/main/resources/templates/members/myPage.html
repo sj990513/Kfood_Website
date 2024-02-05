@@ -33,22 +33,31 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <div style="display: flex;" th:if="${session.member == null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                <div style="display: flex;" sec:authorize="isAnonymous()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
                 </div>
-                <div style="display: flex;" th:if="${session.member != null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+                <div style="display: flex;" sec:authorize="isAuthenticated()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
                     <!-- 관리자권한일시 (0) 관리자페이지로 -->
-                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    <div style="display: flex;">
+                        <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+                        </li>
                     </div>
                 </div>
             </ul>
+            <script th:inline="javascript">
+                var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+                if (logoutSuccessMessage) {
+                    alert(logoutSuccessMessage);
+                }
+            </script>
         </div>
     </div>
 </nav>
@@ -64,52 +73,67 @@
                     <div class="text-center">
                         <h1 class="h4 text-gray-900 mb-4">My Page</h1>
                     </div>
-                    <form class="user">
+                    <form class="user" th:object="${memberDTO}" action="/members/mypage" method="POST" >
                         <div class="form-group row">
                             <div class="col-sm-6 mb-3 mb-sm-0">
                                 <input type="text" class="form-control form-control-user"
-                                       name="userId" placeholder="ID" th:value="${userId}" readonly>
+                                       th:field="*{userId}" placeholder="ID" readonly>
                             </div>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control form-control-user"
-                                       name="userRealName" placeholder="Name" th:value="${userRealName}" required>
+                                       th:field="*{realName}" placeholder="Name" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <input type="text" class="form-control form-control-user"
-                                   name="userEmail" placeholder="Email" th:value="${userEmail}" readonly>
+                                   th:field="*{emailAddress}" placeholder="Email" readonly>
                         </div>
                         <div class="form-group">
                             <input type="text" class="form-control form-control-user"
-                                   name="userPhoneNumber" placeholder="Phone Number ex) 010-1234-5678" th:value="${userPhoneNumber}" required>
+                                   th:field="*{phoneNumber}" placeholder="Phone Number ex) 010-1234-5678" required>
                         </div>
-
                         <div class="form-group row">
                             <div class="col-sm-6 mb-3 mb-sm-0">
                                 <input type="password" class="form-control form-control-user"
-                                       name="password" placeholder="Password" th:value="${userPassword}" required>
+                                       th:field="*{password}" placeholder="Password" required>
                             </div>
                             <div class="col-sm-6">
                                 <input type="password" class="form-control form-control-user"
-                                       name="passwordConfirm" placeholder="Repeat Password" th:value="${userPassword}" required>
+                                       th:field="*{passwordConfirm}" placeholder="Repeat Password" required>
                             </div>
                         </div>
-                        <button type="button"  onclick="submitForm()" class="btn btn-primary btn-user btn-block">
+                        <button type="submit"  class="btn btn-primary btn-user btn-block">
                             Change My Information
                         </button>
                     </form>
 
+
+                    <script th:inline="javascript">
+                        var errorMessage = [[${errorMessage}]];
+                       if (errorMessage) {
+                           alert(errorMessage);
+                       }
+
+                       var successMessage = [[${successMessage}]];
+                       if (successMessage) {
+                           alert(successMessage);
+                       }
+                    </script>
+
                     <script>
+
+                        /*
                         function submitForm() {
                             // Get form data
                             var formData = {
                                 userId: document.getElementsByName('userId')[0].value,
-                                userRealName: document.getElementsByName('userRealName')[0].value,
-                                userEmail: document.getElementsByName('userEmail')[0].value,
-                                userPhoneNumber: document.getElementsByName('userPhoneNumber')[0].value,
+                                realName: document.getElementsByName('realName')[0].value,
+                                emailAddress: document.getElementsByName('emailAddress')[0].value,
+                                phoneNumber: document.getElementsByName('phoneNumber')[0].value,
                                 password: document.getElementsByName('password')[0].value,
                                 passwordConfirm: document.getElementsByName('passwordConfirm')[0].value
                             };
+
 
                             // Convert data to JSON
                             var jsonData = JSON.stringify(formData);
@@ -143,19 +167,20 @@
                                 window.location.href = '/';
                             });
                         }
+                        */
                     </script>
 
                     <hr>
-                    <button type="button" class="btn btn-secondary btn-user btn-block" onclick="location.href='/members/deletepage'">
+                    <button type="button" class="btn btn-secondary btn-user btn-block" onclick="location.href='/members/mypage/deletepage'">
                         I am not hungry anymore!
                     </button>
 
                     <hr>
-                    <button type="button" class="btn btn-success btn-user" onclick="location.href='/members/myPost'">
+                    <button type="button" class="btn btn-success btn-user" onclick="location.href='/members/mypage/mypost'">
                         Check my posts
                     </button>
 
-                    <button type="button" class="btn btn-success btn-user" onclick="location.href='/members/myComment'">
+                    <button type="button" class="btn btn-success btn-user" onclick="location.href='/members/mypage/myComment'">
                         Check my comment
                     </button>
                 </div>

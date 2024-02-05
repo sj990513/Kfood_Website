@@ -1,7 +1,6 @@
-package Kim_project.Kfood_Website.domain;
+package Kim_project.Kfood_Website.dto;
 
-public class Menu {
-
+public class MenuDTO {
     private Long menuNumber;
     private String menuName;
     private Long menuWeight;

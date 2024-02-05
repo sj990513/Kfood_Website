@@ -14,5 +14,5 @@ public interface MemberRepository {
     void updateUserInfo(String id, String name, String phoneNumber, String password);
     void deleteAccount(String id);
     List<Member> findAll();
-    void updateAuthority(String memberId, Long memberAuthority);
+    void updateAuthority(String memberId, String memberAuthority);
 }

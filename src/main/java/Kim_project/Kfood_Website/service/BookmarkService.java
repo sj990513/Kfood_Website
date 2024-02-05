@@ -55,7 +55,7 @@ public class BookmarkService {
     }
 
     //검색어로 검색
-    public List<Menu> sortByBookmarkAnd(String search, Member member) {
+    public List<Menu> sortByBookmarkAndSearch(String search, Member member) {
 
 
         //우선 북마크들을 불러온다

@@ -35,28 +35,30 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <div style="display: flex;" th:if="${session.member == null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                <div style="display: flex;" sec:authorize="isAnonymous()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
                 </div>
-                <div style="display: flex;" th:if="${session.member != null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+                <div style="display: flex;" sec:authorize="isAuthenticated()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
                     <!-- 관리자권한일시 (0) 관리자페이지로 -->
-                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    <div style="display: flex;">
+                        <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+                        </li>
                     </div>
                 </div>
             </ul>
             <script th:inline="javascript">
-                var logoutMessage = [[${logout}]];
-                if (logoutMessage) {
-                     alert(logoutMessage);
+                var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+                if (logoutSuccessMessage) {
+                    alert(logoutSuccessMessage);
                 }
-
             </script>
         </div>
     </div>
@@ -66,15 +68,14 @@
 <!-- 1 Section -->
 <header class="masthead bg-primary text-white text-center">
     <div class="container">
-
-        <form action="/menu/detail" method="GET">
-            <input type="hidden" name="menuNumber" th:value="${menuNumber}" />
-            <button type="submit" class="btn btn-secondary btn-user btn-block">
-                Back To Menu
-            </button>
-        </form>
-
     </div>
+
+    <div class="container">
+        <a class="btn btn-secondary btn-user btn-block" th:href="@{/menu/detail(menuNumber=${menuDTO.menuNumber})}">
+            Back To Menu Detail
+        </a>
+    </div>
+
     <h1></h1>
     <h1></h1>
     <div class="container">
@@ -89,35 +90,35 @@
                     <hr>
                     <hr>
 
-                    <form class="user" action="/menu/editMenu" method="POST">
+                    <form class="user" action="/menu/detail/editMenu" method="POST"  th:object="${menuDTO}">
                         <div class="form-group row">
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_name" placeholder="Menu name" th:value="${menuName}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_name" placeholder="Menu name" th:field="*{menuName}" required>
                             </div>
                             <hr>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_weight" placeholder="1 serving weight (only number)"  th:value="${menuWeight}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_weight" placeholder="1 serving weight (only number)"  th:field="*{menuWeight}" required>
                             </div>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_cal" placeholder="Calorie (only number)" th:value="${menuCal}" required>
-                            </div>
-                            <hr>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_car" placeholder="Carbohydrate (only number)" th:value="${menuCar}" required>
-                            </div>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_pro" placeholder="Protein (only number)" th:value="${menuPro}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_cal" placeholder="Calorie (only number)" th:field="*{menuCal}" required>
                             </div>
                             <hr>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_fat" placeholder="Fat (only number)" th:value="${menuFat}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_car" placeholder="Carbohydrate (only number)" th:field="*{menuCar}" required>
                             </div>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" name="menu_na" placeholder="Salt (only number)" th:value="${menuNa}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_pro" placeholder="Protein (only number)" th:field="*{menuPro}" required>
+                            </div>
+                            <hr>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_fat" placeholder="Fat (only number)" th:field="*{menuFat}" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-user" name="menu_na" placeholder="Salt (only number)" th:field="*{menuNa}" required>
                             </div>
                             <hr>
                             <div>
-                                <input type="text" class="form-control form-control-user" name="menu_image" placeholder="Menu image url" th:value="${menuImage}" required>
+                                <input type="text" class="form-control form-control-user" name="menu_image" placeholder="Menu image url" th:field="*{menuImageUrl}" required>
                             </div>
                         </div>
                         <hr>
@@ -140,7 +141,7 @@
                         </button>
 
                         <!-- hidden으로보내서 editMenu에서 POST로도 사용할수있게-->
-                        <input type="hidden" name="menuNumber_hidden" th:value="${menuNumber}" />
+                        <input type="hidden" name="menuNumber" th:field="*{menuNumber}" />
                         <hr>
                         <button type="submit" class="btn btn-primary btn-user btn-block">
                             Edit Menu

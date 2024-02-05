@@ -42,23 +42,24 @@
                                     <h1 class="h4 text-gray-900 mb-4">Are you hungry? Login Now!!</h1>
                                 </div>
 
-                                <form class="user" method="post" action="/members/loginCheck">
+                                <form class="user" method="POST" th:object="${memberDTO}" th:action="@{/members/loginCheck}">
                                     <div class="form-group">
                                         <input type="text" class="form-control form-control-user"
-                                               name="id" placeholder="Enter ID...">
+                                               name="userId" placeholder="Enter ID...">
                                     </div>
                                     <div class="form-group">
                                         <input type="password" class="form-control form-control-user"
-                                               name="pw" placeholder="Password">
+                                               name="password" placeholder="Password">
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-user btn-block">
                                         Login
                                     </button>
 
                                     <script th:inline="javascript">
-                                    var errorMessage = [[${loginError}]];
-                                    if (errorMessage) {
-                                         alert(errorMessage);
+
+                                    var loginError = [[${session.loginError}]]
+                                    if (loginError) {
+                                        alert(loginError);
                                     }
 
                                     var MyId = [[${yourId}]];

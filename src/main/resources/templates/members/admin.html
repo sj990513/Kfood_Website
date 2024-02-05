@@ -33,22 +33,31 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <div style="display: flex;" th:if="${session.member == null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                <div style="display: flex;" sec:authorize="isAnonymous()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
                 </div>
-                <div style="display: flex;" th:if="${session.member != null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+                <div style="display: flex;" sec:authorize="isAuthenticated()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
                     <!-- 관리자권한일시 (0) 관리자페이지로 -->
-                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    <div style="display: flex;">
+                        <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+                        </li>
                     </div>
                 </div>
             </ul>
+            <script th:inline="javascript">
+                var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+                if (logoutSuccessMessage) {
+                    alert(logoutSuccessMessage);
+                }
+            </script>
         </div>
     </div>
 </nav>
@@ -79,37 +88,37 @@
                 </thead>
                 <tbody>
                 <!-- Iterate over a portion of members based on the current page -->
-                <tr th:each="member : ${members}">
+                <tr th:each="memberDTO : ${memberDTOs}">
                     <td>
                         <!-- Hidden field for memberId -->
-                        <input type="hidden" name="memberId" th:value="${member.memberId}">
+                        <input type="hidden" name="userId" th:value="${memberDTO.userId}">
                         <!-- Display memberId -->
-                        <span th:text="${member.memberId}"></span>
+                        <span th:text="${memberDTO.userId}"></span>
                     </td>
-                    <td th:text="${member.memberPhoneNumber}"></td>
-                    <td th:text="${member.memberName}"></td>
+                    <td th:text="${memberDTO.phoneNumber}"></td>
+                    <td th:text="${memberDTO.realName}"></td>
                     <td>
                         <!-- Dropdown for membership level -->
-                        <select name="memberAuth">
-                            <option value="0" th:selected="${member.memberAuthority == 0}">Administrator</option>
-                            <option value="1" th:selected="${member.memberAuthority == 1}">General Member</option>
+                        <select name="authentication">
+                            <option value="ADMIN" th:selected="${memberDTO.authentication == 'ADMIN'}">Administrator</option>
+                            <option value="USER" th:selected="${memberDTO.authentication == 'USER'}">General Member</option>
                         </select>
                     </td>
                     <td>
                         <!-- 작성글 검색을 위한 버튼 -->
-                        <a th:href="@{/members/searchPost(memberId=${member.memberId})}" class="btn btn-primary">
+                        <a th:href="@{/members/admin/searchPost(memberId=${memberDTO.userId})}" class="btn btn-primary">
                             Search
                         </a>
                     </td>
                     <td>
                         <!-- 댓글 검색을 위한 버튼 -->
-                        <a th:href="@{/members/searchComment(memberId=${member.memberId})}" class="btn btn-primary">
+                        <a th:href="@{/members/admin/searchComment(memberId=${memberDTO.userId})}" class="btn btn-primary">
                             Search
                         </a>
                     </td>
                     <td>
                         <!-- Button to delete member with confirmation -->
-                        <button type="button" class="btn btn-secondary btn-user btn-block"  th:onclick="confirmAndSubmit( [[${member.memberId}]] )">
+                        <button type="button" class="btn btn-secondary btn-user btn-block"  th:onclick="confirmAndSubmit( [[${memberDTO.userId}]] )">
                             Delete
                         </button>
                     </td>
@@ -136,7 +145,7 @@
         console.log(memberId);
         if (confirm('Are you sure you want to delete it?')) {
             var form = document.createElement('form');
-            form.action = '/members/deleteMember';
+            form.action = '/members/admin/deleteMember';
             form.method = 'post';
 
             var input = document.createElement('input');

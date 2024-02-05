@@ -35,29 +35,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ms-auto">
-        <div style="display: flex;" th:if="${session.member == null}">
-          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+        <div style="display: flex;" sec:authorize="isAnonymous()">
+          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
         </div>
-        <div style="display: flex;" th:if="${session.member != null}">
-          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+        <div style="display: flex;" sec:authorize="isAuthenticated()">
+          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
           <!-- 관리자권한일시 (0) 관리자페이지로 -->
-          <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-            <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+          <div style="display: flex;">
+            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+              <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+            </li>
           </div>
         </div>
       </ul>
       <script th:inline="javascript">
-                                    var logoutMessage = [[${logout}]];
-                                    if (logoutMessage) {
-                                         alert(logoutMessage);
-                                    }
-
-            </script>
+        var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+        if (logoutSuccessMessage) {
+            alert(logoutSuccessMessage);
+        }
+      </script>
     </div>
   </div>
 </nav>
@@ -69,20 +71,20 @@
 
 
   <!-- 게시글 작성자만 삭제, 수정 가능-->
-  <div th:if="${session.member != null}" >
-    <div  th:if="${ session.member.get().getMemberId() == menu.getMemberId() }">
-      <form action="/menu/deleteMenu" method="POST" onsubmit="return confirm('Are you sure you want to delete it?')">
+  <div sec:authorize="isAuthenticated()" >
+    <div th:if="${#authentication.name == menuDTO.getMemberId()}">
+      <form action="/menu/detail/deleteMenu" method="POST" onsubmit="return confirm('Are you sure you want to delete it?')">
           <button type="submit" name="menuNumber" class="btn btn-secondary btn-user btn-block"
-                  th:value="${menu.menuNumber}"> Delete Menu
+                  th:value="${menuDTO.menuNumber}"> Delete Menu
           </button>
       </form>
 
       <h5></h5>
 
       <!-- get으로보내서 editMenu에서 POST사용할수있게-->
-      <form action="/menu/editMenu" method="get">
+      <form action="/menu/detail/editMenu" method="get">
         <button type="submit" name="menuNumber" class="btn btn-secondary btn-user btn-block"
-                th:value="${menu.menuNumber}"> Edit This Menu
+                th:value="${menuDTO.menuNumber}"> Edit This Menu
         </button>
       </form>
 
@@ -105,7 +107,7 @@
       <div class="row g-0 align-items-center">
         <div class="col-md-4">
           <div class="d-flex justify-content-center">
-            <img class="card-img" th:src="${menu.menuImageUrl}" style="object-fit: contain; max-height: 300px; max-width: 100%;" alt="..." />
+            <img class="card-img" th:src="${menuDTO.menuImageUrl}" style="object-fit: contain; max-height: 300px; max-width: 100%;" alt="..." />
           </div>
         </div>
         <div class="col-md-8">
@@ -114,25 +116,25 @@
               <h1 class="h4 text-gray-900 mb-4">Food and Nutrition Information</h1>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Menu Name:</span> <span th:text="${menu.menuName}"></span></h5>
+              <h5><span class="fw-bolder">Menu Name:</span> <span th:text="${menuDTO.menuName}"></span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Weight:</span> <span th:text="${menu.menuWeight}"></span><span>g</span></h5>
+              <h5><span class="fw-bolder">Weight:</span> <span th:text="${menuDTO.menuWeight}"></span><span>g</span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Calorie:</span> <span th:text="${menu.menuCal}"></span><span>g</span></h5>
+              <h5><span class="fw-bolder">Calorie:</span> <span th:text="${menuDTO.menuCal}"></span><span>g</span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Carbohydrate:</span> <span th:text="${menu.menuCar}"></span><span>g</span></h5>
+              <h5><span class="fw-bolder">Carbohydrate:</span> <span th:text="${menuDTO.menuCar}"></span><span>g</span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Protein:</span> <span th:text="${menu.menuPro}"></span><span>g</span></h5>
+              <h5><span class="fw-bolder">Protein:</span> <span th:text="${menuDTO.menuPro}"></span><span>g</span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Fat:</span> <span th:text="${menu.menuFat}"></span><span>g</span></h5>
+              <h5><span class="fw-bolder">Fat:</span> <span th:text="${menuDTO.menuFat}"></span><span>g</span></h5>
             </div>
             <div class="text-start">
-              <h5><span class="fw-bolder">Natrium:</span> <span th:text="${menu.menuNa}"></span><span>mg</span></h5>
+              <h5><span class="fw-bolder">Natrium:</span> <span th:text="${menuDTO.menuNa}"></span><span>mg</span></h5>
             </div>
             <div class="text-start">
               <h5></h5>
@@ -152,15 +154,15 @@
   <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
       <div class="row justify-content-center">
-        <div class="col-12 mb-5" th:each="recipe : ${recipeDetail}">
+        <div class="col-12 mb-5" th:each="recipeDTO : ${recipeDTOs}">
           <div class="card h-100">
             <div class="row g-0">
               <div class="col-md-4">
-                <img class="card-img" th:src="${recipe.recipeImageUrl}" style="object-fit: cover; max-height: 100%; max-width: 100%;" alt="..." />
+                <img class="card-img" th:src="${recipeDTO.recipeImageUrl}" style="object-fit: cover; max-height: 100%; max-width: 100%;" alt="..." />
               </div>
               <div class="col-md-8">
                 <div class="card-body p-4">
-                  <h5 class="card-title fw-bolder" th:text="${recipe.recipeDisc}"></h5>
+                  <h5 class="card-title fw-bolder" th:text="${recipeDTO.recipeDisc}"></h5>
                 </div>
               </div>
             </div>
@@ -181,20 +183,23 @@
             <h2 class="text-center mb-4">Comments</h2>
 
             <!-- Display existing comments -->
-            <div th:each="comment : ${comments}">
+            <div th:each="commentDTO : ${commentDTOs}">
               <div class="card mb-3">
                 <div class="card-body">
-                  <h5 class="card-title" th:text="${comment.memberId}"></h5>
-                  <p class="card-text" th:text="${comment.commentText}"></p>
+                  <h5 class="card-title" th:text="${commentDTO.memberId}"></h5>
+                  <p class="card-text" th:text="${commentDTO.commentText}"></p>
 
-                  <div th:if="${session.member != null && comment.memberId == session.member.get().getMemberId()}">
-                    <td>
-                      <form th:action="@{/menu/detail/deleteComment}" method="post" onsubmit="return confirm('Are you sure you want to delete it?')">
-                        <input type="hidden" name="commentNumber" th:value="${comment.commentNumber}" />
-                        <input type="hidden" name="menuNumber" th:value="${menu.menuNumber}" />
-                        <button type="submit" class="btn btn-primary">Delete this comment</button>
-                      </form>
-                    </td>
+                  <div sec:authorize="isAuthenticated()" >
+                    <!-- 댓글 작성자 본인만 보이게 -->
+                    <div th:if="${#authentication.name == commentDTO.getMemberId()}">
+                      <td>
+                        <form th:action="@{/menu/detail/deleteComment}" method="post" onsubmit="return confirm('Are you sure you want to delete it?')">
+                          <input type="hidden" name="commentNumber" th:value="${commentDTO.commentNumber}" />
+                          <input type="hidden" name="menuNumber" th:value="${commentDTO.menuNumber}" />
+                          <button type="submit" class="btn btn-primary">Delete this comment</button>
+                        </form>
+                      </td>
+                    </div>
                   </div>
 
                 </div>
@@ -202,13 +207,13 @@
             </div>
 
             <!--로그인한 사용자만 보이게 -->
-            <div th:if="${session.member != null}">
+            <div sec:authorize="isAuthenticated()">
               <form action="/menu/detail/addComment" method="post" class="mb-4">
                 <div class="mb-3">
                   <label for="commentText" class="form-label">Add your comment:</label>
                   <textarea class="form-control" id="commentText" name="commentText" rows="3" required></textarea>
                 </div>
-                <input type="hidden" name="menuNumber" th:value="${menu.menuNumber}" />
+                <input type="hidden" name="menuNumber" th:value="${menuDTO.menuNumber}" />
                 <button type="submit" class="btn btn-primary">Submit Comment</button>
               </form>
             </div>

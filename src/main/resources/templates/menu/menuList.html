@@ -35,28 +35,30 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <div style="display: flex;" th:if="${session.member == null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                <div style="display: flex;" sec:authorize="isAnonymous()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
                 </div>
-                <div style="display: flex;" th:if="${session.member != null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+                <div style="display: flex;" sec:authorize="isAuthenticated()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
                     <!-- 관리자권한일시 (0) 관리자페이지로 -->
-                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    <div style="display: flex;">
+                        <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+                        </li>
                     </div>
                 </div>
             </ul>
             <script th:inline="javascript">
-                                    var logoutMessage = [[${logout}]];
-                                    if (logoutMessage) {
-                                         alert(logoutMessage);
-                                    }
-
+                var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+                if (logoutSuccessMessage) {
+                    alert(logoutSuccessMessage);
+                }
             </script>
         </div>
     </div>
@@ -115,27 +117,27 @@
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-4 justify-content-center">
-                <div class="col mb-5" th:each="menu : ${menus}">
+                <div class="col mb-5" th:each="menuDTO : ${menuDTOs}">
                     <div class="card h-100">
-                        <img class="card-img-top" th:src="${menu.menuImageUrl}" style="max-width: 300px; height: 200px;" alt="..."/>
+                        <img class="card-img-top" th:src="${menuDTO.menuImageUrl}" style="max-width: 300px; height: 200px;" alt="..."/>
                         <div class="card-body p-4">
                             <div class="text-center">
-                                <h5 class="fw-bolder" th:text="${menu.menuName}"></h5>
+                                <h5 class="fw-bolder" th:text="${menuDTO.menuName}"></h5>
                             </div>
                         </div>
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                             <form action="/menu/detail" method="GET">
                                 <div class="text-center">
                                     <button type="submit" name="menuNumber" class="btn btn-outline-dark mt-auto"
-                                            th:value="${menu.menuNumber}">View Details
+                                            th:value="${menuDTO.menuNumber}">View Details
                                     </button>
                                 </div>
                             </form>
                             <form action="/members/addbookmark" method="POST">
                                 <div class="text-center">
                                     <button type="submit" name="menuNumber" class="btn btn-outline-dark mt-auto"
-                                            th:value="${menu.menuNumber}"
-                                            th:if="${session.member != null}">Add Bookmark
+                                            th:value="${menuDTO.menuNumber}"
+                                            sec:authorize="isAuthenticated()">Add Bookmark
                                     </button>
                                 </div>
                             </form>

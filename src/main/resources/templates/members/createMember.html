@@ -39,7 +39,7 @@
 
 
             <!-- Email Verification Form -->
-            <form id="verifyEmailForm" action="/members/sendmail" method="GET">
+            <form id="verifyEmailForm" action="/members/sendmail" method="GET" >
               <div class="form-group">
                   <input type="text" class="form-control form-control-user" name="email" placeholder="Email" required>
               </div>
@@ -61,12 +61,10 @@
                       url: '/members/sendmail',
                       data: { email: email },
                       success: function (data) {
-                          // Handle the success response if needed
-                          console.log('Success:', data);
 
                           //밑에 hidden으로 넣은 값들
-                          $('input[name="authStringHidden"]').val(data);
-                          $('input[name="userEmail"]').val(email);
+                          $('input[name="authString"]').val(data);
+                          $('input[name="emailAddress"]').val(email);
 
 
                           // You can update the UI or perform other actions here
@@ -75,6 +73,7 @@
                       error: function (error) {
                           // Handle the error response if needed
                           console.error('Error:', error);
+                          alert('Error sending email. Please enter correct email format.');
                       }
                   });
               }
@@ -82,35 +81,37 @@
             <br>
 
 
-            <form class="user" action="/members/create" method="POST">
+            <form class="user" action="/members/create" method="POST" th:object="${memberDTO}">
+              <!-- 이하 생략 -->
+
               <div class="form-group row">
                 <div class="col-sm-6 mb-3 mb-sm-0">
-                  <input type="text" class="form-control form-control-user" name="userId" placeholder="ID" required>
+                  <input type="text" class="form-control form-control-user" th:field="*{userId}" placeholder="ID" required>
                 </div>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control form-control-user" name="userName" placeholder="Name.. ex) KimSunJae" required>
+                  <input type="text" class="form-control form-control-user" th:field="*{realName}" placeholder="Name.. ex) KimSunJae" required>
                 </div>
               </div>
 
               <div class="form-group">
-                <input type="text" class="form-control form-control-user" name="userPhoneNumber" placeholder="Phone Number.. ex) 010-1234-5678" required>
+                <input type="text" class="form-control form-control-user" th:field="*{phoneNumber}" placeholder="Phone Number.. ex) 010-1234-5678" required>
               </div>
 
               <div class="form-group row">
                 <div class="col-sm-4 mb-3 mb-sm-0">
-                  <input type="text" class="form-control form-control-user" name="authString" placeholder="Authentication text" required>
+                  <input type="text" class="form-control form-control-user" th:field="*{authVerify}" placeholder="Authentication text" required>
                 </div>
               </div>
 
-              <input type="hidden" name="userEmail">
-              <input type="hidden" name="authStringHidden">
+              <input type="hidden" th:field="*{emailAddress}" value="">
+              <input type="hidden" th:field="*{authString}" value="">
 
               <div class="form-group row">
                 <div class="col-sm-6 mb-3 mb-sm-0">
-                  <input type="password" class="form-control form-control-user" name="userPassword" placeholder="Password" required>
+                  <input type="password" class="form-control form-control-user" th:field="*{password}" placeholder="Password" required>
                 </div>
                 <div class="col-sm-6">
-                  <input type="password" class="form-control form-control-user" name="password_confirm" placeholder="Repeat Password" required>
+                  <input type="password" class="form-control form-control-user" th:field="*{passwordConfirm}" placeholder="Repeat Password" required>
                 </div>
               </div>
               <button type="submit" class="btn btn-primary btn-user btn-block">

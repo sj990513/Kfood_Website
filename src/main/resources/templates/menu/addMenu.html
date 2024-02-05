@@ -35,29 +35,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ms-auto">
-        <div style="display: flex;" th:if="${session.member == null}">
-          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+        <div style="display: flex;" sec:authorize="isAnonymous()">
+          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
         </div>
-        <div style="display: flex;" th:if="${session.member != null}">
-          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+        <div style="display: flex;" sec:authorize="isAuthenticated()">
+          <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
           <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
           <!-- 관리자권한일시 (0) 관리자페이지로 -->
-          <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-            <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+          <div style="display: flex;">
+            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+              <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+            </li>
           </div>
         </div>
       </ul>
       <script th:inline="javascript">
-                                    var logoutMessage = [[${logout}]];
-                                    if (logoutMessage) {
-                                         alert(logoutMessage);
-                                    }
-
-            </script>
+        var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+        if (logoutSuccessMessage) {
+            alert(logoutSuccessMessage);
+        }
+      </script>
     </div>
   </div>
 </nav>
@@ -83,35 +85,35 @@
           <hr>
           <hr>
           <hr>
-          <form class="user" action="/menu/addmenu" method="POST">
+          <form class="user" action="/menu/addmenu" method="POST" th:object="${menuDTO}">
             <div class="form-group row">
               <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_name" placeholder="Menu name"required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuName}" placeholder="Menu name"required>
               </div>
               <hr>
               <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_weight" placeholder="1 serving weight (only number)" required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuWeight}" placeholder="1 serving weight (only number)" required>
               </div>
               <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_cal" placeholder="Calorie (only number)"required>
-              </div>
-              <hr>
-              <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_car" placeholder="Carbohydrate (only number)"required>
-              </div>
-              <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_pro" placeholder="Protein (only number)"required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuCal}" placeholder="Calorie (only number)"required>
               </div>
               <hr>
               <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_fat" placeholder="Fat (only number)"required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuCar}" placeholder="Carbohydrate (only number)"required>
               </div>
               <div class="col-sm-6">
-                <input type="text" class="form-control form-control-user" name="menu_na" placeholder="Salt (only number)"required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuPro}" placeholder="Protein (only number)"required>
+              </div>
+              <hr>
+              <div class="col-sm-6">
+                <input type="text" class="form-control form-control-user" th:field="*{menuFat}" placeholder="Fat (only number)"required>
+              </div>
+              <div class="col-sm-6">
+                <input type="text" class="form-control form-control-user" th:field="*{menuNa}" placeholder="Salt (only number)"required>
               </div>
               <hr>
               <div>
-                <input type="text" class="form-control form-control-user" name="menu_image" placeholder="Menu image url"required>
+                <input type="text" class="form-control form-control-user" th:field="*{menuImageUrl}" placeholder="Menu image url"required>
               </div>
             </div>
             <hr>

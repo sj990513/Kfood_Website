@@ -35,28 +35,30 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
-                <div style="display: flex;" th:if="${session.member == null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/login">login</a></li>
+                <div style="display: flex;" sec:authorize="isAnonymous()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"  href="/login">login</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/create">Sign Up</a></li>
                 </div>
-                <div style="display: flex;" th:if="${session.member != null}">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${session.member.get().getMemberId()}]])</a></li>
+
+                <div style="display: flex;" sec:authorize="isAuthenticated()">
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/mypage" >My Page ([[${#authentication.name}]])</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/bookmark">Bookmark</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/menu/addmenu">Add Menu</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/logout">Logout</a></li>
 
                     <!-- 관리자권한일시 (0) 관리자페이지로 -->
-                    <div style="display: flex;" th:if="${session.member.get().getMemberAuthority() == 0}">
-                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a></li>
+                    <div style="display: flex;">
+                        <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded" href="/members/admin">회원관리</a>
+                        </li>
                     </div>
                 </div>
             </ul>
             <script th:inline="javascript">
-                var logoutMessage = [[${logout}]];
-                if (logoutMessage) {
-                     alert(logoutMessage);
+                var logoutSuccessMessage = [[${logoutSuccessMessage}]]
+                if (logoutSuccessMessage) {
+                    alert(logoutSuccessMessage);
                 }
-
             </script>
         </div>
     </div>
@@ -83,13 +85,13 @@
                 </thead>
                 <tbody>
                 <!-- Iterate over a portion of members based on the current page -->
-                <tr th:each="comment : ${comments}">
-                    <td th:text="${comment.commentNumber}"></td>
-                    <td th:text="${comment.commentText}"></td>
+                <tr th:each="commentDTO : ${commentDTOs}">
+                    <td th:text="${commentDTO.commentNumber}"></td>
+                    <td th:text="${commentDTO.commentText}"></td>
                     <td>
                         <!-- 삭제버튼 -->
-                        <form th:action="@{/members/deleteComment}" method="post" onsubmit="return confirm('Are you sure you want to delete it?')">
-                            <input type="hidden" name="commentNumber" th:value="${comment.commentNumber}" />
+                        <form th:action="@{/members/mypage/deleteComment}" method="post" onsubmit="return confirm('Are you sure you want to delete it?')">
+                            <input type="hidden" name="commentNumber" th:value="${commentDTO.commentNumber}" />
                             <button type="submit" class="btn btn-primary">Delete</button>
                         </form>
                     </td>

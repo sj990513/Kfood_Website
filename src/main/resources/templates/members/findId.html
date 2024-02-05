@@ -36,16 +36,16 @@
                             <h1 class="h4 text-gray-900 mb-4">Forgot Your Id?</h1>
                         </div>
 
-                        <form class="user" action="/members/findId" method="POST">
+                        <form class="user" action="/members/findId" method="POST" th:object="${memberDTO}">
                             <div class="form-group row">
                                 <div class="col-sm-6 mx-auto">
-                                    <input type="text" class="form-control form-control-user" name="real_name"
+                                    <input type="text" class="form-control form-control-user" th:field="*{realName}"
                                            placeholder="Name.. ex) KimSunJae" required>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-6 mx-auto">
-                                <input type="text" class="form-control form-control-user" name="user_email"
+                                <input type="text" class="form-control form-control-user" th:field="*{emailAddress}"
                                        placeholder="Email.. ex) qwer1234@gmail.com" required>
                                 </div>
                             </div>
