@@ -30,7 +30,8 @@
 <br>
 
 ## ERD 설계
-![erd](https://github.com/sj990513/Kfood_Website/assets/117420071/418259d4-c6ba-4d20-a309-4aa6fc2b6295)
+![erd](https://github.com/sj990513/Kfood_Website/assets/117420071/103e1622-4af5-40f0-99df-331ad43a2794)
+
 
 
 
