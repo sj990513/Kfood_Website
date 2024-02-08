@@ -121,7 +121,14 @@
   * 회원 탈퇴
 ![qwe](https://github.com/sj990513/Kfood_Website/assets/117420071/7c392954-0837-48b0-b9f6-ed63e0fec6d0)
 
+<br>
+<br>
 
+* 회원 관리 페이지
+  * 회원등급변경
+  * 회원이 작성한 게시글, 댓글 확인 및 삭제
+  * 회원 삭제
+![12322](https://github.com/sj990513/Kfood_Website/assets/117420071/64512dd9-06a3-48a3-a39b-fbb169abeabb)
 
 
 
