@@ -62,17 +62,64 @@
 
 
 ## 사용자 페이지 주요 기능 
-- 회원 가입 및 로그인
+* 회원 가입 및 로그인
+  * 이메일 인증 기능
+  * 아이디 중복검사
+  * 비밀번호 일치 검사
+  * 아이디 찾기
+  * 비밀번호 찾기 (이메일) 
+![로그인](https://github.com/sj990513/Kfood_Website/assets/117420071/1a28ec5e-6c03-41bc-90cd-0ce669d5c67b)
+
+<br>
+<br>
+
+* 기본 메뉴 리스트
+  * 영양소 기준 정렬
+  * 검색어 기준 정렬
+![d2d2d2](https://github.com/sj990513/Kfood_Website/assets/117420071/c9bb7ec8-6557-4bab-8e6f-85161b4bdc1a)
+<br>
+<br>
+
+* 로그인 상태의 메뉴 리스트 (북마크 기능 추가)
+![c2c3](https://github.com/sj990513/Kfood_Website/assets/117420071/f1136655-0aea-413a-9287-9a5b01a2e63d)
+<br>
+<br>
+
+* 상세 레시피
+  * 로그인한 사용자만 댓글달기 가능
+  * 게시글 작성자 본인만 게시글 수정, 삭제 가능
+![c3c3c33c](https://github.com/sj990513/Kfood_Website/assets/117420071/ad29ae6b-744e-4aaf-832a-79034d4469c3)
+
+<br>
+<br>
+
+* 게시글 수정
+  * 동적으로 레시피 개수 조절 가능
+![d2d2edex](https://github.com/sj990513/Kfood_Website/assets/117420071/ae442b3f-dfde-48dd-9dfc-fb1b0793b8e6)
+
+<br>
+<br>
+
+* 게시글 추가
+  * 동적으로 레시피 개수 조절 가능
+![add](https://github.com/sj990513/Kfood_Website/assets/117420071/a7f0a845-7d01-435a-8f6d-e40aeeacfdce)
 
 
+<br>
+<br>
 
+* 즐겨찾기
+  * 즐겨찾기 삭제 가능
+![asdasd](https://github.com/sj990513/Kfood_Website/assets/117420071/4b17b3ae-f4fe-4988-ba73-66fdc1591505)
 
+<br>
+<br>
 
-
-
-
-
-
+* 마이페이지
+  * 회원정보수정
+  * 작성한 게시글, 댓글 확인
+  * 회원 탈퇴
+![qwe](https://github.com/sj990513/Kfood_Website/assets/117420071/7c392954-0837-48b0-b9f6-ed63e0fec6d0)
 
 
 
