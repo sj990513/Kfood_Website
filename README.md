@@ -70,7 +70,7 @@
   * 비밀번호 일치 검사
   * 아이디 찾기
   * 비밀번호 찾기 (이메일) 
-![로그인](https://github.com/sj990513/Kfood_Website/assets/117420071/1a28ec5e-6c03-41bc-90cd-0ce669d5c67b)
+![로그인](https://github.com/sj990513/Kfood_Website/assets/117420071/ffe7e98c-8ab2-42c8-9065-734b6428e440)
 
 <br>
 <br>
