@@ -22,7 +22,7 @@ http://www.kfoodwebsite.shop
 - **프레임워크 :** Spring Boot 3.0.6
 
   
-- **추가 프레임워크/라이브러리 :** Spring Security, Tymleaf, Jdbc Template
+- **추가 프레임워크/라이브러리 :** Spring Security, Tymleaf, Jdbc Template, Bootstrap
 
   
 - **DB :** My SQL 8.0.35
