@@ -3,6 +3,8 @@
 
 http://www.kfoodwebsite.shop
 
+(AWS 비용문제로 중단)
+
 <br>
 
  - **개발기간:** 23/12/27 ~ 24/02/08
